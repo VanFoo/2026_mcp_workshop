@@ -12,7 +12,6 @@
       "onAutoForward": "openPreview"
     }
   },
-  "postCreateCommand": "npm install",
   "customizations": {
     "vscode": {
       "extensions": [
