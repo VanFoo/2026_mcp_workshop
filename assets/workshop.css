@@ -1,0 +1,393 @@
+/* MCP Workshop — shared stylesheet */
+
+:root {
+  --bg: #fafaf8;
+  --fg: #1a1a1a;
+  --muted: #6b6b6b;
+  --accent: #0057b8;
+  --accent-light: #e8f0fb;
+  --code-bg: #f0f0ec;
+  --border: #e0e0d8;
+  --green: #1a7a40;
+  --green-bg: #edf7f1;
+  --orange: #b84c00;
+  --orange-bg: #fff3eb;
+  --purple: #5a2d82;
+  --purple-bg: #f4eefb;
+  --red: #b81a1a;
+  --red-bg: #fdeaea;
+  --max-width: 720px;
+  --font-body: 'Georgia', 'Times New Roman', serif;
+  --font-ui: 'Helvetica Neue', 'Arial', sans-serif;
+  --font-code: 'Fira Mono', 'Consolas', 'Monaco', monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 18px;
+  line-height: 1.7;
+  padding: 2rem 1rem 4rem;
+}
+
+.page {
+  max-width: var(--max-width);
+  margin: 0 auto;
+}
+
+/* ── Header ── */
+.lesson-header {
+  border-bottom: 2px solid var(--fg);
+  padding-bottom: 1.5rem;
+  margin-bottom: 2.5rem;
+}
+
+.lesson-meta {
+  font-family: var(--font-ui);
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.5rem;
+}
+
+.lesson-meta a { color: var(--muted); text-decoration: none; }
+.lesson-meta a:hover { color: var(--accent); }
+
+h1 {
+  font-size: 2.2rem;
+  line-height: 1.2;
+  font-weight: normal;
+  margin-bottom: 0.5rem;
+}
+
+.lesson-subtitle {
+  font-size: 1.1rem;
+  color: var(--muted);
+  font-style: italic;
+}
+
+/* ── Typography ── */
+h2 {
+  font-size: 1.45rem;
+  font-weight: normal;
+  margin: 2.5rem 0 0.75rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.25rem;
+}
+
+h3 {
+  font-size: 1.1rem;
+  font-family: var(--font-ui);
+  font-weight: 600;
+  margin: 1.8rem 0 0.5rem;
+  color: var(--fg);
+}
+
+p { margin-bottom: 1rem; }
+
+a { color: var(--accent); }
+a:hover { text-decoration: underline; }
+
+ul, ol {
+  padding-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+li { margin-bottom: 0.3rem; }
+
+/* ── Code ── */
+code {
+  font-family: var(--font-code);
+  font-size: 0.85em;
+  background: var(--code-bg);
+  padding: 0.1em 0.35em;
+  border-radius: 3px;
+}
+
+pre {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1.2rem 1.4rem;
+  overflow-x: auto;
+  margin: 1.2rem 0;
+  font-family: var(--font-code);
+  font-size: 0.84rem;
+  line-height: 1.55;
+}
+
+pre code { background: none; padding: 0; }
+
+/* ── Callout boxes ── */
+.callout {
+  border-left: 4px solid;
+  padding: 0.8rem 1.1rem;
+  margin: 1.4rem 0;
+  border-radius: 0 6px 6px 0;
+  font-size: 0.95rem;
+}
+.callout-title {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 0.3rem;
+}
+.callout.note   { border-color: var(--accent); background: var(--accent-light); }
+.callout.tip    { border-color: var(--green);  background: var(--green-bg); }
+.callout.warn   { border-color: var(--orange); background: var(--orange-bg); }
+.callout.key    { border-color: var(--purple); background: var(--purple-bg); }
+
+/* ── Primitive cards ── */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin: 1.4rem 0;
+}
+
+.card {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.1rem 1.2rem;
+  background: #fff;
+}
+
+.card-icon {
+  font-size: 1.5rem;
+  margin-bottom: 0.4rem;
+}
+
+.card-title {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 0.95rem;
+  margin-bottom: 0.3rem;
+}
+
+.card-tag {
+  display: inline-block;
+  font-family: var(--font-ui);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 0.15em 0.5em;
+  border-radius: 3px;
+  margin-bottom: 0.5rem;
+}
+
+.tag-tool   { background: var(--accent-light); color: var(--accent); }
+.tag-res    { background: var(--green-bg);  color: var(--green); }
+.tag-prompt { background: var(--purple-bg); color: var(--purple); }
+
+.card p { font-size: 0.9rem; color: var(--muted); margin: 0; }
+
+/* ── Architecture diagram ── */
+.arch-diagram {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin: 1.4rem 0;
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  overflow-x: auto;
+}
+
+.arch-box {
+  border: 2px solid;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  text-align: center;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.arch-host   { border-color: #0057b8; color: #0057b8; background: #e8f0fb; }
+.arch-client { border-color: #5a2d82; color: #5a2d82; background: #f4eefb; }
+.arch-server { border-color: #1a7a40; color: #1a7a40; background: #edf7f1; }
+.arch-data   { border-color: #b84c00; color: #b84c00; background: #fff3eb; }
+
+.arch-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.5rem;
+}
+
+.arch-arrow {
+  color: var(--muted);
+  font-size: 1.2rem;
+}
+
+/* ── Quiz ── */
+.quiz {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin: 2rem 0;
+}
+
+.quiz-title {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 1rem;
+  margin-bottom: 1.2rem;
+  color: var(--fg);
+}
+
+.question {
+  margin-bottom: 1.5rem;
+}
+
+.question-text {
+  font-family: var(--font-ui);
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 0.7rem;
+}
+
+.options { list-style: none; padding: 0; }
+
+.options li {
+  margin-bottom: 0.4rem;
+}
+
+.option-btn {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 0.55rem 0.9rem;
+  background: var(--code-bg);
+  border: 1.5px solid var(--border);
+  border-radius: 5px;
+  font-family: var(--font-ui);
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.option-btn:hover { background: var(--accent-light); border-color: var(--accent); }
+.option-btn.correct { background: var(--green-bg); border-color: var(--green); color: var(--green); }
+.option-btn.wrong   { background: var(--red-bg);   border-color: var(--red);   color: var(--red); }
+
+.feedback {
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  margin-top: 0.4rem;
+  min-height: 1.2em;
+  font-style: italic;
+  color: var(--muted);
+}
+
+.quiz-score {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-align: center;
+  padding: 0.8rem;
+  background: var(--accent-light);
+  border-radius: 6px;
+  display: none;
+}
+
+/* ── Navigation ── */
+.lesson-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+  font-family: var(--font-ui);
+  font-size: 0.88rem;
+  gap: 1rem;
+}
+
+.nav-link {
+  color: var(--accent);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.nav-link:hover { text-decoration: underline; }
+
+.nav-center {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+/* ── Ask your teacher callout ── */
+.ask-teacher {
+  background: var(--accent-light);
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  padding: 1rem 1.2rem;
+  margin: 2.5rem 0 0;
+  font-family: var(--font-ui);
+  font-size: 0.88rem;
+}
+
+.ask-teacher strong { display: block; margin-bottom: 0.2rem; }
+
+/* ── Workshop progress bar ── */
+.progress-bar {
+  font-family: var(--font-ui);
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  flex-wrap: wrap;
+}
+
+.progress-step {
+  padding: 0.2em 0.6em;
+  border-radius: 3px;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+}
+
+.progress-step.active {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+.progress-step.done {
+  background: var(--green-bg);
+  color: var(--green);
+  border-color: var(--green);
+}
+
+.progress-sep { color: var(--border); }
+
+/* ── Primary source ── */
+.primary-source {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem 1.2rem;
+  margin: 1.5rem 0;
+  font-family: var(--font-ui);
+  font-size: 0.88rem;
+  background: #fff;
+}
+
+.primary-source-label {
+  font-weight: 700;
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.3rem;
+}

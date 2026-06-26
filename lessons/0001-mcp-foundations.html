@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 1 — MCP Foundations</title>
+  <link rel="stylesheet" href="../assets/workshop.css">
+</head>
+<body>
+<div class="page">
+
+  <!-- Header -->
+  <header class="lesson-header">
+    <div class="lesson-meta">
+      <a href="../MISSION.md">MCP Workshop</a> &nbsp;·&nbsp; Lesson 1 of 4
+    </div>
+    <h1>MCP Foundations</h1>
+    <p class="lesson-subtitle">What it is, why it exists, and how the pieces fit together</p>
+  </header>
+
+  <!-- Progress -->
+  <div class="progress-bar">
+    <span class="progress-step active">1 · Foundations</span>
+    <span class="progress-sep">›</span>
+    <span class="progress-step"><a href="0002-first-fastmcp-server.html">2 · First Server</a></span>
+    <span class="progress-sep">›</span>
+    <span class="progress-step"><a href="0003-primitives-deep-dive.html">3 · Primitives</a></span>
+    <span class="progress-sep">›</span>
+    <span class="progress-step"><a href="0004-build-an-agent.html">4 · Build an Agent</a></span>
+  </div>
+
+  <!-- Primary source -->
+  <div class="primary-source">
+    <div class="primary-source-label">Primary Source</div>
+    <strong><a href="https://modelcontextprotocol.io/docs/learn/architecture" target="_blank">MCP Architecture Overview — modelcontextprotocol.io</a></strong><br>
+    The official spec team's explanation of hosts, clients, servers, primitives, and transports. Read this after this lesson.
+  </div>
+
+  <!-- Section 1 -->
+  <h2>1. The Problem MCP Solves</h2>
+
+  <p>
+    Before MCP, connecting an AI model to an external tool — a database, a calendar, a file system — meant writing custom integration code for every combination. Five AI apps × ten data sources = fifty bespoke connectors, each fragile and non-transferable.
+  </p>
+
+  <p>
+    MCP (Model Context Protocol) is an open standard that defines <em>one</em> protocol for that connection. Anthropic published it in late 2024; by mid-2025 it had been adopted by OpenAI, Google, and Microsoft and donated to the Linux Foundation.
+  </p>
+
+  <div class="callout key">
+    <div class="callout-title">The USB-C Analogy</div>
+    MCP is to AI applications what USB-C is to devices. Instead of one charger per laptop brand, you get one standard port. Build an MCP server once, and any MCP-compatible host — Claude Desktop, VS Code Copilot, Cursor, your own Python agent — can use it.
+  </div>
+
+  <!-- Section 2 -->
+  <h2>2. The Three Roles: Host, Client, Server</h2>
+
+  <p>Every MCP interaction involves exactly three kinds of participant:</p>
+
+  <div class="arch-diagram">
+    <div style="text-align:center; font-weight:700; margin-bottom:1rem; font-size:0.9rem; letter-spacing:0.05em; text-transform:uppercase; color:#6b6b6b;">MCP Architecture</div>
+
+    <!-- Host box -->
+    <div style="border:2px solid #0057b8; border-radius:8px; padding:1rem; margin-bottom:0.7rem; background:#e8f0fb;">
+      <div style="font-weight:700; color:#0057b8; margin-bottom:0.5rem;">🖥  MCP Host (AI Application)</div>
+      <div style="display:flex; gap:0.5rem; flex-wrap:wrap; justify-content:center;">
+        <div style="border:1.5px solid #5a2d82; border-radius:5px; padding:0.3rem 0.7rem; background:#f4eefb; color:#5a2d82; font-weight:600; font-size:0.82rem;">MCP Client 1</div>
+        <div style="border:1.5px solid #5a2d82; border-radius:5px; padding:0.3rem 0.7rem; background:#f4eefb; color:#5a2d82; font-weight:600; font-size:0.82rem;">MCP Client 2</div>
+        <div style="border:1.5px solid #5a2d82; border-radius:5px; padding:0.3rem 0.7rem; background:#f4eefb; color:#5a2d82; font-weight:600; font-size:0.82rem;">MCP Client N</div>
+      </div>
+    </div>
+
+    <!-- Arrows -->
+    <div style="display:flex; justify-content:space-around; font-size:1.3rem; color:#6b6b6b; margin-bottom:0.5rem;">
+      <span>⇅</span><span>⇅</span><span>⇅</span>
+    </div>
+    <div style="font-size:0.75rem; text-align:center; color:#6b6b6b; margin-bottom:0.5rem;">
+      JSON-RPC 2.0 over stdio (local) or HTTP (remote)
+    </div>
+
+    <!-- Servers -->
+    <div style="display:flex; gap:0.7rem; flex-wrap:wrap; justify-content:center;">
+      <div style="border:2px solid #1a7a40; border-radius:6px; padding:0.5rem 0.8rem; background:#edf7f1; text-align:center;">
+        <div style="font-weight:700; color:#1a7a40; font-size:0.85rem;">MCP Server A</div>
+        <div style="font-size:0.75rem; color:#6b6b6b;">Filesystem</div>
+      </div>
+      <div style="border:2px solid #1a7a40; border-radius:6px; padding:0.5rem 0.8rem; background:#edf7f1; text-align:center;">
+        <div style="font-weight:700; color:#1a7a40; font-size:0.85rem;">MCP Server B</div>
+        <div style="font-size:0.75rem; color:#6b6b6b;">Database</div>
+      </div>
+      <div style="border:2px solid #b84c00; border-radius:6px; padding:0.5rem 0.8rem; background:#fff3eb; text-align:center;">
+        <div style="font-weight:700; color:#b84c00; font-size:0.85rem;">MCP Server C</div>
+        <div style="font-size:0.75rem; color:#6b6b6b;">Remote API</div>
+      </div>
+    </div>
+  </div>
+
+  <h3>Host</h3>
+  <p>
+    The <strong>host</strong> is the AI application — Claude Desktop, VS Code, or your own Python agent. The host owns the LLM interaction and decides which tools to call. It creates and manages one <em>client</em> per server it talks to.
+    <a href="https://modelcontextprotocol.io/docs/learn/architecture#participants" target="_blank">[source]</a>
+  </p>
+
+  <h3>Client</h3>
+  <p>
+    An <strong>MCP client</strong> is a connection object inside the host, dedicated to one server. Think of it as the host's "phone line" to a specific server. One server = one client. The client handles the protocol details so the host doesn't have to.
+  </p>
+
+  <h3>Server</h3>
+  <p>
+    An <strong>MCP server</strong> is a program that exposes capabilities — tools, data, and templates — for the host to use. It can run locally (as a subprocess, via stdio) or remotely (over HTTP). In this workshop, <strong>you will build the server</strong>.
+  </p>
+
+  <!-- Section 3 -->
+  <h2>3. The Three Primitives</h2>
+
+  <p>
+    Servers expose capabilities using exactly three primitive types. Every MCP server is just a combination of these three things:
+  </p>
+
+  <div class="cards">
+    <div class="card">
+      <div class="card-icon">🔧</div>
+      <div class="card-title">Tool</div>
+      <span class="card-tag tag-tool">Executable</span>
+      <p>A function the LLM can call to <em>do</em> something: write a file, query a database, send an API request. Think of it like a POST endpoint.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">📄</div>
+      <div class="card-title">Resource</div>
+      <span class="card-tag tag-res">Read-only Data</span>
+      <p>A data source the LLM can read: a file's contents, a database schema, a feed. Addressed by a URI like <code>notes://all</code>. Think of it like a GET endpoint.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">💬</div>
+      <div class="card-title">Prompt</div>
+      <span class="card-tag tag-prompt">Template</span>
+      <p>A reusable, parameterised prompt template the host can inject into conversations — system prompts, few-shot examples, slash commands.</p>
+    </div>
+  </div>
+
+  <div class="callout tip">
+    <div class="callout-title">Mental Model</div>
+    A <strong>tool</strong> changes the world. A <strong>resource</strong> describes the world. A <strong>prompt</strong> shapes how the LLM talks about the world.
+  </div>
+
+  <!-- Section 4 -->
+  <h2>4. How They Communicate</h2>
+
+  <p>
+    MCP uses <strong>JSON-RPC 2.0</strong> — a simple request/response protocol over plain JSON. You don't need to write JSON-RPC yourself (FastMCP handles it), but it helps to understand the flow:
+  </p>
+
+  <ol>
+    <li><strong>Initialize:</strong> The client and server shake hands, announcing which capabilities each supports.</li>
+    <li><strong>Discover:</strong> The client calls <code>tools/list</code> to learn what tools exist.</li>
+    <li><strong>Execute:</strong> When the LLM wants to use a tool, the client calls <code>tools/call</code> with the tool name and arguments.</li>
+    <li><strong>Respond:</strong> The server runs the function and returns a result — usually a text or structured JSON payload.</li>
+  </ol>
+
+  <pre><code>// Discovery request
+{ "method": "tools/list" }
+
+// Server response
+{ "tools": [{ "name": "create_note", "description": "Create a new note", ... }] }
+
+// Execution request
+{ "method": "tools/call", "params": { "name": "create_note", "arguments": { "title": "Ideas" } } }
+
+// Result
+{ "content": [{ "type": "text", "text": "Note 'Ideas' created with id 42" }] }</code></pre>
+
+  <h3>Transport: stdio vs HTTP</h3>
+  <p>
+    <strong>stdio (local):</strong> The host spawns the server as a subprocess. They communicate through stdin/stdout. Fast, simple, no networking. This is what we'll use in this workshop.
+    <br>
+    <strong>HTTP (remote):</strong> The server runs as a web service; clients connect over the network. Used for production, shared servers.
+  </p>
+
+  <!-- Section 5 — Capstone preview -->
+  <h2>5. What We're Building</h2>
+
+  <p>
+    Across this workshop, you'll build a <strong>Notes MCP Server</strong> and an <strong>agent that uses it</strong>. Here's the full picture:
+  </p>
+
+  <div class="callout note">
+    <div class="callout-title">Workshop Capstone</div>
+    <strong>Notes MCP Server</strong> (Python, FastMCP)<br>
+    <ul style="margin-top:0.5rem;">
+      <li>🔧 <strong>Tools:</strong> <code>create_note</code>, <code>list_notes</code>, <code>delete_note</code></li>
+      <li>📄 <strong>Resources:</strong> <code>notes://all</code>, <code>notes://{id}</code></li>
+      <li>💬 <strong>Prompts:</strong> <code>summarize_notes</code> template</li>
+    </ul>
+    <br>
+    <strong>Agent Task:</strong> "Read all my notes, summarise them, and save the summary as a new note."
+  </div>
+
+  <p>
+    Each lesson adds one layer. By Lesson 4, you'll have a running server and a working agent — built from scratch.
+  </p>
+
+  <!-- Quiz -->
+  <h2>6. Check Your Understanding</h2>
+
+  <div class="quiz">
+    <div class="quiz-title">🧠 Quick Quiz — answer from memory, not by scrolling up</div>
+
+    <!-- Q1 -->
+    <div class="question" id="q1">
+      <div class="question-text">1. An MCP <strong>host</strong> is best described as…</div>
+      <ul class="options">
+        <li><button class="option-btn" onclick="answer(this,'q1',false)">A Python script that exposes tools via decorators</button></li>
+        <li><button class="option-btn" onclick="answer(this,'q1',true)">The AI application that manages clients and owns the LLM</button></li>
+        <li><button class="option-btn" onclick="answer(this,'q1',false)">A JSON-RPC 2.0 message router between servers</button></li>
+        <li><button class="option-btn" onclick="answer(this,'q1',false)">The transport layer that converts stdio to HTTP</button></li>
+      </ul>
+      <div class="feedback" id="q1-fb"></div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="question" id="q2">
+      <div class="question-text">2. You want the LLM to be able to <em>delete</em> a row from a database. Which primitive do you use?</div>
+      <ul class="options">
+        <li><button class="option-btn" onclick="answer(this,'q2',false)">Resource — it reads the database schema</button></li>
+        <li><button class="option-btn" onclick="answer(this,'q2',false)">Prompt — it templates the SQL query</button></li>
+        <li><button class="option-btn" onclick="answer(this,'q2',true)">Tool — it executes an action that changes state</button></li>
+        <li><button class="option-btn" onclick="answer(this,'q2',false)">Transport — it routes the message over HTTP</button></li>
+      </ul>
+      <div class="feedback" id="q2-fb"></div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="question" id="q3">
+      <div class="question-text">3. In the stdio transport, how does the host start the MCP server?</div>
+      <ul class="options">
+        <li><button class="option-btn" onclick="answer(this,'q3',false)">It sends an HTTP GET to the server's /init endpoint</button></li>
+        <li><button class="option-btn" onclick="answer(this,'q3',false)">It reads the server's config from a YAML file on disk</button></li>
+        <li><button class="option-btn" onclick="answer(this,'q3',true)">It spawns the server as a subprocess and pipes stdin/stdout</button></li>
+        <li><button class="option-btn" onclick="answer(this,'q3',false)">It imports the server module and calls its main() function</button></li>
+      </ul>
+      <div class="feedback" id="q3-fb"></div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="question" id="q4">
+      <div class="question-text">4. Which MCP primitive is addressed by a URI like <code>notes://all</code>?</div>
+      <ul class="options">
+        <li><button class="option-btn" onclick="answer(this,'q4',false)">Tool — because it references a named function</button></li>
+        <li><button class="option-btn" onclick="answer(this,'q4',true)">Resource — it's a URI-addressed read-only data source</button></li>
+        <li><button class="option-btn" onclick="answer(this,'q4',false)">Prompt — because it's a template identifier</button></li>
+        <li><button class="option-btn" onclick="answer(this,'q4',false)">Transport — because it looks like a URL scheme</button></li>
+      </ul>
+      <div class="feedback" id="q4-fb"></div>
+    </div>
+
+    <!-- Q5 -->
+    <div class="question" id="q5">
+      <div class="question-text">5. How many MCP clients does a host create when connecting to three different MCP servers?</div>
+      <ul class="options">
+        <li><button class="option-btn" onclick="answer(this,'q5',false)">One shared client that multiplexes all three servers</button></li>
+        <li><button class="option-btn" onclick="answer(this,'q5',false)">Zero — the host talks directly to servers via sockets</button></li>
+        <li><button class="option-btn" onclick="answer(this,'q5',true)">Three — one dedicated client per server connection</button></li>
+        <li><button class="option-btn" onclick="answer(this,'q5',false)">It depends on whether the servers use stdio or HTTP</button></li>
+      </ul>
+      <div class="feedback" id="q5-fb"></div>
+    </div>
+
+    <div class="quiz-score" id="quiz-score"></div>
+  </div>
+
+  <!-- Ask teacher -->
+  <div class="ask-teacher">
+    <strong>Questions? Ask your teacher.</strong>
+    If anything here is unclear — the architecture, the primitives, the USB-C analogy — type your question in the chat. Your agent-teacher can explain any concept, draw diagrams, or show alternative examples on demand.
+  </div>
+
+  <!-- Navigation -->
+  <nav class="lesson-nav">
+    <span style="color:var(--muted);">← (this is the first lesson)</span>
+    <span class="nav-center">Lesson 1 / 4</span>
+    <a class="nav-link" href="0002-first-fastmcp-server.html">Lesson 2: Your First Server →</a>
+  </nav>
+
+</div>
+
+<script>
+const explanations = {
+  q1: {
+    correct: "Correct. The host is the AI application — Claude Desktop, Cursor, or your own Python agent. It manages one client per server and owns the LLM conversation.",
+    wrong: "Not quite. The host is the AI application (like Claude Desktop). It creates and manages MCP clients, which then talk to servers."
+  },
+  q2: {
+    correct: "Correct. Tools are for executable actions that change state — writes, deletes, API calls. A delete is exactly a Tool.",
+    wrong: "Not quite. Deleting a row is a state-changing action, which makes it a Tool. Resources are read-only; Prompts are templates."
+  },
+  q3: {
+    correct: "Correct. With stdio transport, the host spawns the server as a subprocess and communicates through its stdin/stdout pipes.",
+    wrong: "Not quite. The stdio transport works by spawning the server as a subprocess — no HTTP, no config files. Communication is via stdin/stdout pipes."
+  },
+  q4: {
+    correct: "Correct. Resources are addressed by URIs (like notes://all or file:///path/to/doc). They are read-only data sources.",
+    wrong: "Not quite. URI-addressed items are Resources — read-only data sources. Tools are named functions, not URIs."
+  },
+  q5: {
+    correct: "Correct. The host creates one dedicated MCP client per server. Three servers = three clients, each with its own connection.",
+    wrong: "Not quite. MCP requires one client per server — there is no multiplexing. Three servers = three clients."
+  }
+};
+
+let answered = {};
+let correct = 0;
+const total = 5;
+
+function answer(btn, qid, isCorrect) {
+  if (answered[qid]) return;
+  answered[qid] = true;
+
+  const fb = document.getElementById(qid + '-fb');
+  const allBtns = btn.closest('.options').querySelectorAll('.option-btn');
+  allBtns.forEach(b => b.disabled = true);
+
+  if (isCorrect) {
+    btn.classList.add('correct');
+    fb.textContent = '✓ ' + explanations[qid].correct;
+    fb.style.color = 'var(--green)';
+    correct++;
+  } else {
+    btn.classList.add('wrong');
+    fb.textContent = '✗ ' + explanations[qid].wrong;
+    fb.style.color = 'var(--red)';
+    // reveal correct
+    allBtns.forEach(b => {
+      const onclick = b.getAttribute('onclick');
+      if (onclick && onclick.includes('true')) b.classList.add('correct');
+    });
+  }
+
+  if (Object.keys(answered).length === total) {
+    const scoreEl = document.getElementById('quiz-score');
+    scoreEl.style.display = 'block';
+    const pct = Math.round((correct / total) * 100);
+    if (pct === 100) {
+      scoreEl.textContent = `🎉 ${correct}/${total} — Perfect! You're ready for Lesson 2.`;
+      scoreEl.style.background = 'var(--green-bg)';
+      scoreEl.style.color = 'var(--green)';
+    } else if (pct >= 60) {
+      scoreEl.textContent = `${correct}/${total} — Good. Review the sections you missed, then move on.`;
+    } else {
+      scoreEl.textContent = `${correct}/${total} — Re-read sections 2–3 before moving on.`;
+      scoreEl.style.background = 'var(--red-bg)';
+      scoreEl.style.color = 'var(--red)';
+    }
+  }
+}
+</script>
+</body>
+</html>
